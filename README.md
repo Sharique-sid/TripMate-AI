@@ -1,87 +1,75 @@
-# Multi-Agent-System-using-LangGraph-MCP-Supervisor-Guardrails-HITL
+<div align="center">
+  <h1>🌍 TripMate AI</h1>
+  <p><strong>Autonomous Multi-Agent Orchestration Platform for Travel Planning</strong></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Python-3.11+-blue.svg" alt="Python Version" />
+    <img src="https://img.shields.io/badge/FastAPI-0.103+-009688.svg" alt="FastAPI" />
+    <img src="https://img.shields.io/badge/LangGraph-AI-orange.svg" alt="LangGraph" />
+    <img src="https://img.shields.io/badge/PostgreSQL-Supabase-green.svg" alt="PostgreSQL" />
+  </p>
+</div>
 
-A demo multi-agent system that uses LangGraph and MCP to implement a travel-planning assistant with a Supervisor, input Guardrails, and Human-In-The-Loop (HITL) approval flows. The project includes a FastAPI frontend, example MCP server, and client helpers to demonstrate how agents, supervisors, and guardrails can be composed into a safe, reviewable planning pipeline.
+---
 
-Key ideas:
-- Multi-agent coordination using LangGraph and MCP
-- Supervisor agent to manage complex workflows
-- Input guardrails to validate user requests
-- Human-in-the-loop approval for generated plans
+## 🚀 Overview
+**TripMate AI** is a production-grade multi-agent system designed to synthesize complex, dynamic travel itineraries. Built on **LangGraph** and exposed via a non-blocking **FastAPI** backend, the platform leverages a Supervisor routing architecture to delegate tasks to specialized AI agents.
 
-Contents
-- `app.py`: FastAPI web frontend and API endpoints
-- `backend.py`: core agent orchestration / travel-planner logic
-- `mcp_client.py`: client helpers to interact with the MCP server
-- `custom_weather_mcp_server.py`: example MCP server for weather checks
-- `templates/`, `static/`: frontend UI assets (HTML, JS, CSS)
+### ✨ Key Features
+* 🤖 **Multi-Agent Orchestration**: A central Supervisor agent seamlessly coordinates specialized worker agents (e.g., Weather MCP, Search) to gather context and build itineraries.
+* 🛑 **Human-In-The-Loop (HITL)**: Integrated state checkpoints using PostgreSQL (via Supabase) allow users to intercept AI drafts, inject feedback, and force revisions *before* the final generation, drastically reducing LLM hallucination and saving tokens.
+* 🛡️ **Input Guardrails**: Prevents prompt injection and off-topic requests (e.g., "Write me a poem") using pre-computation validation nodes.
+* 🌐 **Model Context Protocol (MCP)**: Features a custom MCP weather server, demonstrating extensibility for enterprise data adapters.
+* 💎 **Glassmorphism UI**: A sleek, custom-designed frontend connected to asynchronous FastAPI endpoints.
 
-Features
-- Interactive web UI for sending travel planning prompts
-- Endpoint for drafting travel plans and separate approval endpoint
-- Example MCP server demonstrating domain adapters (weather, checkpoints)
+---
 
-Prerequisites
-- Python 3.10+ (recommended)
-- Git (to clone the repo)
-- A virtual environment tool (venv) or similar
+## 🏗️ Architecture
 
-Quick start (Windows)
+1. **Supervisor Node**: Evaluates user intent and routes the query to either the validation node, the planning node, or external MCP tools.
+2. **State Management**: LangGraph's `AsyncPostgresSaver` persists the thread state to a remote PostgreSQL database, allowing for asynchronous HITL interruptions.
+3. **Frontend Integration**: An asynchronous API (`/api/travel` and `/api/travel/approve`) handles long-running LLM streams without blocking the main event loop.
 
-1. Create and activate a virtual environment
+---
 
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1    # PowerShell
-```
+## 🛠️ Tech Stack
+* **Core**: Python, FastAPI, Uvicorn
+* **AI/LLM**: LangChain, LangGraph, Groq, Tavily
+* **Database**: PostgreSQL (Supabase) for Checkpoint Memory
+* **Extensibility**: Model Context Protocol (MCP)
+* **Frontend**: HTML5, Vanilla JavaScript, Custom CSS (Glassmorphism)
+* **Deployment**: Docker, Render
 
-2. Install dependencies
+---
 
-```powershell
-pip install -r requirements.txt
-```
+## 💻 Local Development
 
-3. Run the FastAPI app (development)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Sharique-sid/TripMate-AI.git
+   cd TripMate-AI
+   ```
 
-```powershell
-# option A (run module)
-python app.py
+2. **Set up environment variables**  
+   Create a `.env` file in the root directory:
+   ```env
+   GROQ_API_KEY=your_key
+   TAVILY_API_KEY=your_key
+   DATABASE_URL=postgresql://user:password@host:port/db
+   ```
 
-# option B (uvicorn)
-uvicorn app:app --reload --host 127.0.0.1 --port 8000
-```
+3. **Run with Docker**
+   ```bash
+   docker build -t tripmate-ai .
+   docker run -p 8000:8000 --env-file .env tripmate-ai
+   ```
 
-4. Open the web UI
+4. **Access the application**
+   Navigate to `http://localhost:8000` in your browser.
 
-Visit http://127.0.0.1:8000 in your browser to use the TripMate frontend.
+---
 
-Running the MCP server (example)
-- The repository includes `custom_weather_mcp_server.py` as an example MCP server. Run it in a separate terminal if you want to experiment with custom adapters used by the demo.
-
-```powershell
-# start example MCP server (if needed)
-python custom_weather_mcp_server.py
-```
-
-API Endpoints
-- `POST /api/travel` — create or resume a travel planning thread. JSON: `{ "message": "<user prompt>", "thread_id": "optional-thread-id" }`
-- `POST /api/travel/approve` — approve or request revisions for a draft. JSON: `{ "thread_id": "<id>", "approved": true|false, "feedback": "optional" }`
-- `GET /health` — basic health check and features list
-
-Configuration & environment
-- Secrets and API keys are not included in the repo. Use environment variables or a `.env` file for any required keys consumed by `langgraph`, `langchain`, or other adapters.
-
-Development notes
-- The project keeps synchronous convenience wrappers in `backend.py` while running an async FastAPI server — `nest_asyncio` is applied in `app.py` to allow the sync helpers to call async MCP helpers.
-- Tests are not included; to experiment, interact with the web UI or call the API endpoints directly.
-
-Contributing
-- Contributions are welcome. Please open issues or pull requests for bug fixes, documentation improvements, or new adapter examples.
-
-License
-- This repository follows the license in the `LICENSE` file.
-
-Acknowledgements
-- Built as a demonstration of LangGraph + MCP patterns with supervisor and guardrail concepts.
-
-Contact
-- For questions or suggestions, open an issue or contact the repository owner.
+## 👤 Author
+**Sharique Hussain**  
+*Full Stack & AI Engineer*  
+[LinkedIn](https://linkedin.com/in/sharique-hussain-a21ab1283/) | [GitHub](https://github.com/Sharique-sid)
